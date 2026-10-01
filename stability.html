@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>流式统计聚合 · 算法稳定性对比</title>
+<style>
+:root { color-scheme: light; }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+       background: #f4f6f8; color: #1f2733; }
+main { max-width: 980px; margin: 0 auto; padding: 24px 20px 48px; }
+header h1 { font-size: 22px; margin: 8px 0 4px; }
+header .sub { color: #5a6675; font-size: 13px; margin: 0 0 16px; }
+section { background: #fff; border: 1px solid #e2e7ec; border-radius: 10px;
+          padding: 16px 20px; margin: 14px 0; }
+h2 { font-size: 16px; margin: 0 0 10px; }
+code { background: #eef1f4; border-radius: 4px; padding: 1px 5px; font-size: 12px; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { border: 1px solid #e2e7ec; padding: 6px 10px; text-align: right;
+         font-variant-numeric: tabular-nums; }
+th { background: #f0f3f6; text-align: center; }
+td:first-child, th:first-child { text-align: left; }
+.note { color: #5a6675; font-size: 12px; margin: 8px 0 0; }
+ul { margin: 6px 0 0; padding-left: 20px; font-size: 13px; line-height: 1.7; }
+.pass { color: #1e7e34; font-weight: 600; }
+.fail { color: #c0392b; font-weight: 600; }
+</style>
+</head>
+<body>
+<main>
+<header>
+<h1>流式统计聚合 · 算法稳定性对比</h1>
+<p class="sub">数据源 <code>samples/data/02-big-small-step.txt</code> · count = 1000 ·
+本页全部数值取自页面底部内嵌报告（与命令 stdout 逐字节一致），页面不做任何重算。</p>
+</header>
+<section>
+<h2>三种算法的误差比</h2>
+<svg viewBox="0 0 940 400" width="100%" role="img" aria-label="三种算法 mean 与 variance 的误差比柱状图"><line x1="90" y1="330.00" x2="910" y2="330.00" stroke="#e2e7ec" stroke-width="1"/><text x="82" y="334.00" text-anchor="end" font-size="11" fill="#5a6675">0</text><line x1="90" y1="315.36" x2="910" y2="315.36" stroke="#e2e7ec" stroke-width="1"/><text x="82" y="319.36" text-anchor="end" font-size="11" fill="#5a6675">1</text><line x1="90" y1="279.35" x2="910" y2="279.35" stroke="#e2e7ec" stroke-width="1"/><text x="82" y="283.35" text-anchor="end" font-size="11" fill="#5a6675">10</text><line x1="90" y1="232.52" x2="910" y2="232.52" stroke="#e2e7ec" stroke-width="1"/><text x="82" y="236.52" text-anchor="end" font-size="11" fill="#5a6675">100</text><line x1="90" y1="184.07" x2="910" y2="184.07" stroke="#e2e7ec" stroke-width="1"/><text x="82" y="188.07" text-anchor="end" font-size="11" fill="#5a6675">1000</text><line x1="90" y1="135.45" x2="910" y2="135.45" stroke="#e2e7ec" stroke-width="1"/><text x="82" y="139.45" text-anchor="end" font-size="11" fill="#5a6675">10000</text><line x1="90" y1="86.82" x2="910" y2="86.82" stroke="#e2e7ec" stroke-width="1"/><text x="82" y="90.82" text-anchor="end" font-size="11" fill="#5a6675">100000</text><line x1="90" y1="38.18" x2="910" y2="38.18" stroke="#e2e7ec" stroke-width="1"/><text x="82" y="42.18" text-anchor="end" font-size="11" fill="#5a6675">1e+06</text><text x="82" y="20" text-anchor="end" font-size="11" fill="#5a6675">误差比（log 刻度）</text><rect x="155.67" y="330.00" width="64" height="0.50" fill="#d9534f"><title>naive mean 误差比 = 0.0</title></rect><text x="187.67" y="324.00" text-anchor="middle" font-size="10" fill="#1f2733">0.0</text><rect x="233.67" y="30.00" width="64" height="300.00" fill="#d9534f99"><title>naive variance 误差比 = 1472930.772253704</title></rect><text x="265.67" y="24.00" text-anchor="middle" font-size="10" fill="#1f2733">1472930.772253704</text><text x="226.67" y="348" text-anchor="middle" font-size="13" font-weight="600" fill="#1f2733">naive</text><rect x="429.00" y="330.00" width="64" height="0.50" fill="#e8a13c"><title>shifted mean 误差比 = 0.0</title></rect><text x="461.00" y="324.00" text-anchor="middle" font-size="10" fill="#1f2733">0.0</text><rect x="507.00" y="330.00" width="64" height="0.50" fill="#e8a13c99"><title>shifted variance 误差比 = 0.0</title></rect><text x="539.00" y="324.00" text-anchor="middle" font-size="10" fill="#1f2733">0.0</text><text x="500.00" y="348" text-anchor="middle" font-size="13" font-weight="600" fill="#1f2733">shifted</text><rect x="702.33" y="330.00" width="64" height="0.50" fill="#3d9970"><title>stable mean 误差比 = 0.0</title></rect><text x="734.33" y="324.00" text-anchor="middle" font-size="10" fill="#1f2733">0.0</text><rect x="780.33" y="330.00" width="64" height="0.50" fill="#3d997099"><title>stable variance 误差比 = 0.0</title></rect><text x="812.33" y="324.00" text-anchor="middle" font-size="10" fill="#1f2733">0.0</text><text x="773.33" y="348" text-anchor="middle" font-size="13" font-weight="600" fill="#1f2733">stable</text><line x1="90" y1="315.36" x2="910" y2="315.36" stroke="#c0392b" stroke-width="1.6" stroke-dasharray="7 5"/><text x="916" y="319.36" font-size="11" fill="#c0392b">容差线 误差比=1</text><rect x="90" y="376" width="12" height="12" fill="#7a8694"/><text x="108" y="386" font-size="11" fill="#5a6675">mean 误差比（每组左柱，深色）</text><rect x="310" y="376" width="12" height="12" fill="#7a869499"/><text x="328" y="386" font-size="11" fill="#5a6675">variance 误差比（每组右柱，浅色）</text></svg>
+<p class="note">误差比 = |算法值 − 高精度参考值| ÷ (1e-9 + 1e-9×|参考值|)；柱高按
+log10(误差比 + 1) 映射以便同图对比，柱顶标注为误差比精确值；红色虚线为容差线（误差比 = 1），
+柱高不超过容差线即该项进容差。参考值由 decimal 60 位有效数字在同一遍输入中顺带算出。</p>
+</section>
+<section>
+<h2>各算法数值</h2>
+<table>
+<tr><th>算法</th><th>mean</th><th>variance</th><th>mean 误差比</th><th>variance 误差比</th></tr>
+<tr><td>naive</td><td>1000000249.75</td><td>20864.0</td><td class="pass">0.0</td><td class="fail">1472930.772253704</td></tr><tr><td>shifted</td><td>1000000249.75</td><td>20833.3125</td><td class="pass">0.0</td><td class="pass">0.0</td></tr><tr><td>stable</td><td>1000000249.75</td><td>20833.3125</td><td class="pass">0.0</td><td class="pass">0.0</td></tr>
+<tr><td>reference（decimal 60 位）</td><td>1000000249.75</td>
+<td>20833.3125</td><td>—</td><td>—</td></tr>
+</table>
+</section>
+<section>
+<h2>关键指标（stable 口径）</h2>
+<table>
+<tr><th>指标</th><th>值</th></tr>
+<tr><td>count</td><td>1000</td></tr><tr><td>min</td><td>1000000000.0</td></tr><tr><td>max</td><td>1000000499.5</td></tr><tr><td>mean</td><td>1000000249.75</td></tr><tr><td>variance</td><td>20833.3125</td></tr><tr><td>p10</td><td>1000000249.75</td></tr><tr><td>p50</td><td>1000000249.75</td></tr><tr><td>p90</td><td>1000000249.75</td></tr><tr><td>p99</td><td>1000000249.75</td></tr>
+</table>
+</section>
+<section>
+<h2>口径说明</h2>
+<ul>
+<li>分桶：x&gt;0 时取整数 e 使 10^e ≤ x &lt; 10^(e+1)，首位 d = ⌊x / 10^e⌋，桶记作 (+e, d)；
+x&lt;0 对 |x| 同样分桶记作 (−e, d)；0 单独一桶。每个桶只维护个数与总和。</li>
+<li>分位数：桶代表值 = 桶内元素算术平均；rank r = p×(n−1)，i = ⌊r⌋，f = r−i，
+按第 i / i+1 个元素（升序、0 基）所在桶的代表值线性插值，最后夹到 [min, max]。</li>
+<li>stable：均值用 Neumaier 补偿求和，总体方差用 Welford 递推并对 M2 补偿累加（除以 n）。</li>
+<li>naive：float 直接累加 Σx、Σx²；shifted：以第一个数为平移量累加后换算。</li>
+<li>容差：|得到值 − 精确值| ≤ 1e-9 + 1e-9×|精确值|；误差比即左端除以右端。</li>
+</ul>
+</section>
+</main>
+<script id="report" type="application/json">{"algorithms":[{"mean":1000000249.75,"mean_error_ratio":0.0,"name":"naive","variance":20864.0,"variance_error_ratio":1472930.772253704},{"mean":1000000249.75,"mean_error_ratio":0.0,"name":"shifted","variance":20833.3125,"variance_error_ratio":0.0},{"mean":1000000249.75,"mean_error_ratio":0.0,"name":"stable","variance":20833.3125,"variance_error_ratio":0.0}],"count":1000,"max":1000000499.5,"mean":1000000249.75,"min":1000000000.0,"quantiles":{"p10":1000000249.75,"p50":1000000249.75,"p90":1000000249.75,"p99":1000000249.75},"reference":{"mean":1000000249.75,"variance":20833.3125},"source":"samples/data/02-big-small-step.txt","tolerance":{"absolute":1e-09,"relative":1e-09},"variance":20833.3125}</script>
+</body>
+</html>
